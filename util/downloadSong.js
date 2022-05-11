@@ -1,30 +1,16 @@
-var YoutubeMp3Downloader = require("youtube-mp3-downloader");
+const fs = require("fs");
+const ytdl = require("ytdl-core");
 
-var YD = new YoutubeMp3Downloader({
-    "ffmpegPath": "./ffmpeg",        // FFmpeg binary location
-    "outputPath": "../resources/songs",    // Output file location (default: the home directory)
-    "youtubeVideoQuality": "highestaudio",  // Desired video quality (default: highestaudio)
-    "queueParallelism": 2,                  // Download parallelism (default: 1)
-    "progressTimeout": 2000,                // Interval in ms for the progress reports (default: 1000)
-    "allowWebm": false                      // Enable download from WebM sources (default: false)
-});
+async function download(id) {
+  let valid = await ytdl.validateURL(id);
 
-function download(id) {
-    YD.download(id)
+  if (valid) {
+    let info = await ytdl.getBasicInfo(id);
+    await ytdl(id).pipe(fs.createWriteStream(`${info.videoDetails.title}.mp3`));
+    return "SUCCESS";
+  }
 }
-
-YD.on("finished", function(err, data) {
-    console.log(JSON.stringify(data));
-});
-
-YD.on("error", function(error) {
-    console.log(error);
-});
-
-YD.on("progress", function(progress) {
-    console.log(JSON.stringify(progress));
-});
 
 module.exports = {
-    download
-}
+  download,
+};
