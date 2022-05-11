@@ -17,22 +17,16 @@ console.log("Listening on port 3000");
 
 app.post("/download", async (req, res) => {
   if (req.body.id) {
-    let valid = await ytdl.validateURL(req.body.id);
 
-    if (valid) {
-      let info = await ytdl.getBasicInfo(req.body.id);
-      await ytdl(req.body.id).pipe(
-        fs.createWriteStream(`${info.videoDetails.title}.mp3`)
-      );
-      const file = `${info.videoDetails.title}.mp3`;
-      setTimeout(() => {
-          res.download(file)
-      }, 5000)
-    } else {
-      res.status(404).send("FAIL");
-    }
-  }
-  else {
-      res.status(400).send("NO LINK PROVIDED")
+    let info = await ytdl.getBasicInfo(req.body.id);
+    await ytdl(req.body.id).pipe(
+      fs.createWriteStream(`${info.videoDetails.title}.mp3`)
+    );
+    const file = `${info.videoDetails.title}.mp3`;
+    setTimeout(() => {
+      res.download(file);
+    }, 3000);
+  } else {
+    res.status(400).send("NO LINK PROVIDED");
   }
 });
